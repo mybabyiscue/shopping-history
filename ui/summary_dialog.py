@@ -1,9 +1,9 @@
+import os
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, 
     QDialogButtonBox, QMessageBox
 )
 from PyQt5.QtCore import Qt
-import uuid
 import csv
 from datetime import datetime
 
@@ -45,8 +45,26 @@ class SummaryDialog(QDialog):
         self.accept()
 
     def get_summary_data(self):
+        # 生成自增ID
+        new_id = 1  # 默认ID
+        summary_path = os.path.join("data", "summary.csv")
+        
+        try:
+            if os.path.exists(summary_path):
+                with open(summary_path, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    if reader.fieldnames and "汇总ID" in reader.fieldnames:
+                        valid_ids = []
+                        for row in reader:
+                            if row.get("汇总ID", "").isdigit():
+                                valid_ids.append(int(row["汇总ID"]))
+                        if valid_ids:
+                            new_id = max(valid_ids) + 1
+        except Exception:
+            pass  # 如果出现任何错误，使用默认ID
+            
         return {
-            "summary_id": str(uuid.uuid4()),
+            "summary_id": str(new_id),
             "name": self.name_input.text().strip(),
             "note": self.note_input.text().strip(),
             "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

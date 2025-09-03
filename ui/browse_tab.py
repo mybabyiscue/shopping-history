@@ -377,8 +377,8 @@ class BrowseTab(QWidget):
     def on_edit_record(self, row):
         try:
             record_data = {
-                "记录ID": self.table.item(row, 1).text(),  # 内部仍使用"记录ID"作为键
-                "ID": self.table.item(row, 1).text(),      # 同时保留"ID"字段
+                "记录ID": self.table.item(row, 1).text(),
+                "ID": self.table.item(row, 1).text(),
                 "物品": self.table.item(row, 2).text(),
                 "用途": self.table.item(row, 3).text(),
                 "平台": self.table.item(row, 4).text(),
@@ -526,21 +526,30 @@ class BrowseTab(QWidget):
 
             # 在summary.csv中添加新记录
             summary_path = os.path.join("data", "summary.csv")
-            file_exists = os.path.isfile(summary_path) and os.path.getsize(summary_path) > 0
+            fieldnames = ["汇总ID", "汇总名称", "汇总备注", "汇总时间", "是否报销"]
             
-            with open(summary_path, "a", newline="", encoding="utf-8") as f:
-                writer = csv.DictWriter(f, fieldnames=[
-                    "汇总ID", "汇总名称", "汇总备注", "汇总时间", "是否报销"
-                ])
-                if not file_exists:
-                    writer.writeheader()
-                writer.writerow({
-                    "汇总ID": summary_data["summary_id"],
-                    "汇总名称": summary_data["name"],
-                    "汇总备注": summary_data["note"],
-                    "汇总时间": summary_data["time"],
-                    "是否报销": summary_data["reimbursed"]
-                })
+            # 读取现有数据
+            rows = []
+            if os.path.exists(summary_path):
+                with open(summary_path, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    if reader.fieldnames == fieldnames:  # 检查列名是否匹配
+                        rows = list(reader)
+            
+            # 添加新记录
+            rows.append({
+                "汇总ID": summary_data["summary_id"],
+                "汇总名称": summary_data["name"],
+                "汇总备注": summary_data["note"],
+                "汇总时间": summary_data["time"],
+                "是否报销": summary_data["reimbursed"]
+            })
+            
+            # 写入更新后的数据
+            with open(summary_path, "w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(rows)
 
             QMessageBox.information(self, "成功", "汇总创建成功")
             self.load_data()  # 刷新表格

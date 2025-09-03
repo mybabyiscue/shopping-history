@@ -17,15 +17,21 @@ class RecordManager:
     def _ensure_chinese_headers(self):
         """确保CSV文件使用中文字段名"""
         if not os.path.exists(self.records_file):
+            self.initialize_records_file()
             return
             
         # 检查文件是否为空
         if os.path.getsize(self.records_file) == 0:
-            # 如果是空文件，直接写入正确的表头
-            with open(self.records_file, 'w', encoding='utf-8', newline='') as f:
-                writer = csv.DictWriter(f, fieldnames=self._fieldnames)
-                writer.writeheader()
+            self.initialize_records_file()
             return
+
+    @staticmethod
+    def initialize_records_file(records_file='data/records.csv'):
+        """初始化records.csv文件"""
+        os.makedirs(os.path.dirname(records_file), exist_ok=True)
+        with open(records_file, 'w', encoding='utf-8', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=RecordManager._fieldnames)
+            writer.writeheader()
             
         # 读取第一行检查表头
         try:
@@ -56,11 +62,11 @@ class RecordManager:
         self.records_file = 'data/records.csv'
         self.summaries_file = 'data/summaries.json'
         
-        # 定义字段名（移除了'是否报销'）
+        # 定义字段名（包含汇总ID）
         self._fieldnames = [
             '记录ID', '用途', '平台', '物品',
             '数量', '总价', '购买日期',
-            '是否收到', '是否开票'
+            '是否收到', '是否开票', '汇总ID'
         ]
         self.fieldnames = self._fieldnames  # 保持兼容性
         

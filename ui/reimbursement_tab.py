@@ -36,13 +36,27 @@ class ReimbursementTab(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.setAlternatingRowColors(True)
         
-        # 设置列宽
-        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
-        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
-        self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.Fixed)
-        self.table.setColumnWidth(4, 180)
+        # 设置自适应列宽
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)  # 汇总名称
+        header.setSectionResizeMode(1, QHeaderView.Stretch)  # 汇总备注
+        header.setSectionResizeMode(2, QHeaderView.Stretch)  # 汇总时间
+        header.setSectionResizeMode(3, QHeaderView.Stretch)  # 是否报销
+        
+        # 操作列固定宽度
+        header.setSectionResizeMode(4, QHeaderView.Fixed)
+        self.table.setColumnWidth(4, 360)
+        
+        # 设置默认行高
+        self.table.verticalHeader().setDefaultSectionSize(36)
+        
+        # 启用交替行颜色
+        self.table.setAlternatingRowColors(True)
+        self.table.setStyleSheet("""
+            QTableWidget {
+                alternate-background-color: #f8f8f8;
+            }
+        """)
 
         main_layout.addWidget(self.table)
 
@@ -78,17 +92,17 @@ class ReimbursementTab(QWidget):
                 btn_layout.setSpacing(5)
 
                 view_btn = QPushButton("查看")
-                view_btn.setFixedWidth(50)
+                view_btn.setFixedWidth(80)
                 view_btn.clicked.connect(lambda _, r=row: self.view_details(summary["汇总ID"]))
                 btn_layout.addWidget(view_btn)
 
                 edit_btn = QPushButton("编辑")
-                edit_btn.setFixedWidth(50)
+                edit_btn.setFixedWidth(80)
                 edit_btn.clicked.connect(lambda _, r=row: self.edit_summary(summary["汇总ID"]))
                 btn_layout.addWidget(edit_btn)
 
                 delete_btn = QPushButton("删除")
-                delete_btn.setFixedWidth(50)
+                delete_btn.setFixedWidth(80)
                 delete_btn.clicked.connect(lambda _, r=row: self.delete_summary(summary["汇总ID"]))
                 btn_layout.addWidget(delete_btn)
 

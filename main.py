@@ -37,7 +37,7 @@ def setup_environment():
     records_file = 'data/records.csv'
     if not os.path.exists(records_file):
         with open(records_file, 'w', encoding='utf-8') as f:
-            f.write('记录ID,用途,平台,物品,数量,总价,购买日期,是否收到,是否开票\n')
+            f.write('记录ID,用途,平台,物品,数量,总价,购买日期,是否收到,是否开票,汇总ID\n')
 
 def main():
     """主函数"""
