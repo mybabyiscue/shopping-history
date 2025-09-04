@@ -518,20 +518,62 @@ class BrowseTab(QWidget):
                         error_records.append(row)
             
             if error_records:
-                # 显示简化错误信息
                 error_ids = ", ".join([r["记录ID"] for r in error_records])
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Warning)
-                msg.setWindowTitle("汇总失败")
-                
-                # 创建带红色文本的错误信息
-                error_label = QLabel(f"记录ID: <font color='red'>{error_ids}</font> 已存在汇总中，无法再次汇总")
-                error_label.setTextFormat(Qt.RichText)
-                
-                # 设置消息框布局
-                layout = msg.layout()
-                layout.addWidget(error_label, 0, 0, 1, layout.columnCount())
-                msg.exec_()
+
+                class ErrorDialog(QDialog):
+                    def __init__(self, ids, parent=None):
+                        super().__init__(parent)
+                        self.setWindowTitle("汇总失败")
+                        self.setFixedSize(420, 220)
+                        self.setStyleSheet("""
+                            QDialog {
+                                background-color: #ffffff;
+                                border-radius: 8px;
+                            }
+                            QLabel {
+                                font-size: 14px;
+                                color: #333333;
+                            }
+                            QPushButton {
+                                min-width: 80px;
+                                min-height: 30px;
+                                border-radius: 6px;
+                                background-color: #0078d7;
+                                color: white;
+                                font-size: 14px;
+                            }
+                            QPushButton:hover {
+                                background-color: #005a9e;
+                            }
+                        """)
+
+                        layout = QVBoxLayout(self)
+                        layout.setContentsMargins(20, 20, 20, 20)
+                        layout.setSpacing(15)
+
+                        # 标题
+                        title_label = QLabel("⚠️ 以下记录已存在汇总中，无法再次汇总：")
+                        title_label.setStyleSheet("font-size:16px; font-weight:bold; color:#d9534f;")
+                        layout.addWidget(title_label)
+
+                        # 记录ID
+                        error_label = QLabel(f"<font color='red'><b><span style='font-size:18px'>{ids}</span></b></font>")
+                        error_label.setTextFormat(Qt.RichText)
+                        error_label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+                        layout.addWidget(error_label)
+
+                        layout.addStretch()
+
+                        # 按钮
+                        btn_layout = QHBoxLayout()
+                        btn_layout.addStretch()
+                        ok_btn = QPushButton("确定")
+                        ok_btn.clicked.connect(self.accept)
+                        btn_layout.addWidget(ok_btn)
+                        layout.addLayout(btn_layout)
+
+                dlg = ErrorDialog(error_ids, self)
+                dlg.exec_()
                 return
 
             # 更新records.csv中的汇总ID

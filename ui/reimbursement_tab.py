@@ -115,7 +115,6 @@ class ReimbursementTab(QWidget):
 
                 # 将汇总ID存储在表格项的用户数据中
                 self.table.item(row, 0).setData(Qt.UserRole, summary["汇总ID"])
-                print(f"DEBUG: 行 {row} 设置汇总ID: {summary['汇总ID']}")
 
                 btn_widget.setLayout(btn_layout)
                 self.table.setCellWidget(row, 4, btn_widget)
@@ -154,12 +153,9 @@ class ReimbursementTab(QWidget):
                     current_summary_id = str(summary_id).strip()
                     if record_summary_id == current_summary_id:
                         related_records.append(r)
-                        print(f"DEBUG: 匹配记录 {r['记录ID']} - 汇总ID: {record_summary_id} (期望: {current_summary_id})")
-                print(f"DEBUG: 找到 {len(related_records)} 条匹配汇总ID {current_summary_id} 的记录")
 
             # 创建详情窗口并传递汇总信息和相关记录（确保使用原始汇总ID）
             from ui.detail_dialog import DetailDialog
-            print(f"DEBUG: 传递到详情对话框的汇总ID: {summary_id} (类型: {type(summary_id)})")
             dialog = DetailDialog({
                 "summary_info": summary_info,
                 "related_records": [r for r in related_records 

@@ -58,17 +58,17 @@ class DetailDialog(QDialog):
         # 填充记录数据（按购买日期降序排序）
         records = []
         current_summary_id = str(data['summary_info']['汇总ID']).strip()
-        print(f"DEBUG: 当前对话框汇总ID: {current_summary_id}")
+        # print(f"DEBUG: 当前对话框汇总ID: {current_summary_id}")
         
         for r in data['related_records']:
             record_summary_id = str(r.get("汇总ID", "")).strip()
-            print(f"DEBUG: 检查记录 {r['记录ID']} - 汇总ID: {record_summary_id}")
+            # print(f"DEBUG: 检查记录 {r['记录ID']} - 汇总ID: {record_summary_id}")
             if record_summary_id == current_summary_id:
                 records.append(r)
-                print(f"DEBUG: 匹配记录 {r['记录ID']} - 汇总ID: {record_summary_id}")
+                # print(f"DEBUG: 匹配记录 {r['记录ID']} - 汇总ID: {record_summary_id}")
         
         records = sorted(records, key=lambda x: x.get("购买日期", ""), reverse=True)
-        print(f"DEBUG: 最终展示 {len(records)} 条记录 (期望汇总ID: {current_summary_id})")
+        # print(f"DEBUG: 最终展示 {len(records)} 条记录 (期望汇总ID: {current_summary_id})")
         if len(records) == 0:
             print("DEBUG: 警告：没有找到匹配的记录！")
         self.table.setRowCount(len(records))
