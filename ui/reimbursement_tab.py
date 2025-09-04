@@ -71,10 +71,14 @@ class ReimbursementTab(QWidget):
             with open(summary_path, "r", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 summaries = list(reader)
+            
+            summaries.sort(key=lambda x: x["汇总时间"], reverse=True)
 
             self.table.setRowCount(len(summaries))
             for row, summary in enumerate(summaries):
-                self.table.setItem(row, 0, QTableWidgetItem(summary["汇总名称"]))
+                item = QTableWidgetItem(summary["汇总名称"])
+                item.setData(Qt.UserRole, summary["汇总ID"])  # 存储汇总ID
+                self.table.setItem(row, 0, item)
                 self.table.setItem(row, 1, QTableWidgetItem(summary["汇总备注"]))
                 self.table.setItem(row, 2, QTableWidgetItem(summary["汇总时间"]))
                 
@@ -93,18 +97,25 @@ class ReimbursementTab(QWidget):
 
                 view_btn = QPushButton("查看")
                 view_btn.setFixedWidth(80)
-                view_btn.clicked.connect(lambda _, r=row: self.view_details(summary["汇总ID"]))
+                view_btn.clicked.connect(lambda _, r=row: 
+                    self.view_details(self.table.item(r, 0).data(Qt.UserRole)))
                 btn_layout.addWidget(view_btn)
 
                 edit_btn = QPushButton("编辑")
                 edit_btn.setFixedWidth(80)
-                edit_btn.clicked.connect(lambda _, r=row: self.edit_summary(summary["汇总ID"]))
+                edit_btn.clicked.connect(lambda _, r=row: 
+                    self.edit_summary(self.table.item(r, 0).data(Qt.UserRole)))
                 btn_layout.addWidget(edit_btn)
 
                 delete_btn = QPushButton("删除")
                 delete_btn.setFixedWidth(80)
-                delete_btn.clicked.connect(lambda _, r=row: self.delete_summary(summary["汇总ID"]))
+                delete_btn.clicked.connect(lambda _, r=row: 
+                    self.delete_summary(self.table.item(r, 0).data(Qt.UserRole)))
                 btn_layout.addWidget(delete_btn)
+
+                # 将汇总ID存储在表格项的用户数据中
+                self.table.item(row, 0).setData(Qt.UserRole, summary["汇总ID"])
+                print(f"DEBUG: 行 {row} 设置汇总ID: {summary['汇总ID']}")
 
                 btn_widget.setLayout(btn_layout)
                 self.table.setCellWidget(row, 4, btn_widget)
@@ -115,6 +126,21 @@ class ReimbursementTab(QWidget):
     def view_details(self, summary_id):
         """查看汇总详情"""
         try:
+            # 首先从summary.csv获取汇总基本信息
+            summary_path = os.path.join("data", "summary.csv")
+            if not os.path.exists(summary_path):
+                QMessageBox.information(self, "提示", "没有找到汇总记录")
+                return
+
+            with open(summary_path, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                summary_info = next((s for s in reader if s["汇总ID"] == summary_id), None)
+            
+            if not summary_info:
+                QMessageBox.information(self, "提示", "找不到指定的汇总记录")
+                return
+
+            # 然后从records.csv获取相关记录
             records_path = os.path.join("data", "records.csv")
             if not os.path.exists(records_path):
                 QMessageBox.information(self, "提示", "没有找到相关记录")
@@ -122,15 +148,23 @@ class ReimbursementTab(QWidget):
 
             with open(records_path, "r", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
-                related_records = [r for r in reader if r.get("汇总ID") == summary_id]
+                related_records = []
+                for r in reader:
+                    record_summary_id = str(r.get("汇总ID", "")).strip()
+                    current_summary_id = str(summary_id).strip()
+                    if record_summary_id == current_summary_id:
+                        related_records.append(r)
+                        print(f"DEBUG: 匹配记录 {r['记录ID']} - 汇总ID: {record_summary_id} (期望: {current_summary_id})")
+                print(f"DEBUG: 找到 {len(related_records)} 条匹配汇总ID {current_summary_id} 的记录")
 
-            if not related_records:
-                QMessageBox.information(self, "提示", "该汇总没有包含任何记录")
-                return
-
-            # 创建详情窗口
+            # 创建详情窗口并传递汇总信息和相关记录（确保使用原始汇总ID）
             from ui.detail_dialog import DetailDialog
-            dialog = DetailDialog(related_records, self)
+            print(f"DEBUG: 传递到详情对话框的汇总ID: {summary_id} (类型: {type(summary_id)})")
+            dialog = DetailDialog({
+                "summary_info": summary_info,
+                "related_records": [r for r in related_records 
+                                  if str(r.get('汇总ID', '')).strip() == str(summary_id).strip()]
+            }, self)
             dialog.exec_()
 
         except Exception as e:

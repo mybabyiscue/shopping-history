@@ -72,5 +72,5 @@ class SummaryDialog(QDialog):
             "name": self.name_input.text().strip(),
             "note": self.note_input.text().strip(),
             "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "reimbursed": self.reimbursement_check.isChecked()
+            "reimbursed": self.reimbursement_check.isChecked()  # 返回布尔值，由调用方处理格式
         }

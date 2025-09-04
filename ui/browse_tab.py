@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
     QDateEdit, QCheckBox, QHeaderView, QSizePolicy, 
     QComboBox, QLineEdit, QMessageBox, QDialog
 )
+from PyQt5.QtGui import QColor
 from ui.summary_dialog import SummaryDialog
 import csv
 import os
@@ -507,8 +508,33 @@ class BrowseTab(QWidget):
     def create_summary(self, summary_data, selected_record_ids):
         """创建汇总记录"""
         try:
-            # 更新records.csv中的汇总ID
+            # 检查记录是否已有汇总ID
             records_path = os.path.join("data", "records.csv")
+            error_records = []
+            with open(records_path, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row["记录ID"] in selected_record_ids and row.get("汇总ID"):
+                        error_records.append(row)
+            
+            if error_records:
+                # 显示简化错误信息
+                error_ids = ", ".join([r["记录ID"] for r in error_records])
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setWindowTitle("汇总失败")
+                
+                # 创建带红色文本的错误信息
+                error_label = QLabel(f"记录ID: <font color='red'>{error_ids}</font> 已存在汇总中，无法再次汇总")
+                error_label.setTextFormat(Qt.RichText)
+                
+                # 设置消息框布局
+                layout = msg.layout()
+                layout.addWidget(error_label, 0, 0, 1, layout.columnCount())
+                msg.exec_()
+                return
+
+            # 更新records.csv中的汇总ID
             updated_records = []
             with open(records_path, "r", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
@@ -542,7 +568,7 @@ class BrowseTab(QWidget):
                 "汇总名称": summary_data["name"],
                 "汇总备注": summary_data["note"],
                 "汇总时间": summary_data["time"],
-                "是否报销": summary_data["reimbursed"]
+                "是否报销": "是" if summary_data.get("reimbursed", False) else "否"
             })
             
             # 写入更新后的数据
