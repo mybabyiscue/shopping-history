@@ -1,7 +1,7 @@
 import os
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, 
-    QDialogButtonBox, QMessageBox
+    QDialogButtonBox, QMessageBox, QCheckBox
 )
 from PyQt5.QtCore import Qt
 import csv
@@ -28,6 +28,10 @@ class SummaryDialog(QDialog):
         self.note_input = QLineEdit()
         self.note_input.setPlaceholderText("可选")
         layout.addWidget(self.note_input)
+
+        # 报销状态
+        self.reimbursement_check = QCheckBox("是否报销")
+        layout.addWidget(self.reimbursement_check)
 
         # 按钮
         buttons = QDialogButtonBox(
@@ -68,5 +72,5 @@ class SummaryDialog(QDialog):
             "name": self.name_input.text().strip(),
             "note": self.note_input.text().strip(),
             "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "reimbursed": "否"
+            "reimbursed": self.reimbursement_check.isChecked()
         }

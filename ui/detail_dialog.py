@@ -11,7 +11,13 @@ class DetailDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("汇总详情")
         self.setMinimumWidth(800)
+        self.resize(1000, 600)  # 设置初始窗口大小
         self.setup_ui(records)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if hasattr(self, 'table'):
+            self.table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
 
     def setup_ui(self, records):
         layout = QVBoxLayout(self)
@@ -27,8 +33,7 @@ class DetailDialog(QDialog):
         self.table.setAlternatingRowColors(True)
         
         # 设置列宽
-        for col in range(self.table.columnCount()):
-            self.table.horizontalHeader().setSectionResizeMode(col, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         
         # 填充数据
         self.table.setRowCount(len(records))

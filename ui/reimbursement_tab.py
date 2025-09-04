@@ -153,12 +153,14 @@ class ReimbursementTab(QWidget):
             dialog = SummaryDialog(self)
             dialog.name_input.setText(summary["汇总名称"])
             dialog.note_input.setText(summary["汇总备注"])
+            dialog.reimbursement_check.setChecked(summary["是否报销"] == "是")
             dialog.setWindowTitle("编辑汇总")
 
             if dialog.exec_() == QDialog.Accepted:
                 summary_data = dialog.get_summary_data()
                 summary["汇总名称"] = summary_data["name"]
                 summary["汇总备注"] = summary_data["note"]
+                summary["是否报销"] = "是" if summary_data.get("reimbursed", False) else "否"
                 
                 # 更新文件
                 with open(summary_path, "w", newline="", encoding="utf-8") as f:
