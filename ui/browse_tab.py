@@ -447,14 +447,16 @@ class BrowseTab(QWidget):
         btn_layout.setSpacing(10)
 
         edit_btn = QPushButton()
-        edit_btn.setIcon(QtGui.QIcon("ui/icons/edit-solid.svg"))
+        icon_path = os.path.join(os.path.dirname(__file__), "icons", "edit-solid.svg")
+        edit_btn.setIcon(QtGui.QIcon(icon_path))
         edit_btn.setIconSize(QtCore.QSize(16, 16))
         edit_btn.setFixedWidth(32)
         edit_btn.setToolTip("编辑")
         edit_btn.clicked.connect(lambda _, r=row: self.on_edit_record(r))
 
         del_btn = QPushButton()
-        del_btn.setIcon(QtGui.QIcon("ui/icons/trash-solid.svg"))
+        icon_path = os.path.join(os.path.dirname(__file__), "icons", "trash-solid.svg")
+        del_btn.setIcon(QtGui.QIcon(icon_path))
         del_btn.setIconSize(QtCore.QSize(16, 16))
         del_btn.setFixedWidth(32)
         del_btn.setToolTip("删除")

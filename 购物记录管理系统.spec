@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=['E:\\anaconda3\\Library\\plugins'],
     binaries=[],
-    datas=[('data', 'data'), ('config', 'config')],
+    datas=[('data', 'data'), ('config', 'config'), ('ui/icons', 'ui/icons')],
     hiddenimports=['PyQt5.QtWidgets', 'PyQt5.QtCore', 'PyQt5.QtGui', 'matplotlib.backends.backend_qtagg'],
     hookspath=[],
     hooksconfig={},

@@ -7,6 +7,7 @@ echo 正在打包购物记录管理系统...
 pyinstaller --name=购物记录管理系统 --onefile --windowed ^
 --add-data="data;data" ^
 --add-data="config;config" ^
+--add-data="ui/icons;ui/icons" ^
 --paths="E:\anaconda3\Library\plugins" ^
 --hidden-import=PyQt5.QtWidgets ^
 --hidden-import=PyQt5.QtCore ^
