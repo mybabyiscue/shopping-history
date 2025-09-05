@@ -33,8 +33,24 @@ python main.py
 双击 build.bat
 
 # 方法2：手动打包
-pyinstaller --name=购物记录管理系统 --onefile --windowed --add-data="data;data" --add-data="config;config" --hidden-import=PyQt5.QtWidgets --hidden-import=PyQt5.QtCore --hidden-import=PyQt5.QtGui --hidden-import=csv --hidden-import=hashlib --hidden-import=datetime --clean main.py
+pyinstaller --name=购物记录管理系统 --onefile --windowed --add-data="data;data" --add-data="config;config" --add-data="ui/icons;ui/icons" --hidden-import=PyQt5.QtWidgets --hidden-import=PyQt5.QtCore --hidden-import=PyQt5.QtGui --hidden-import=csv --hidden-import=hashlib --hidden-import=datetime --clean main.py
 ```
+
+### 打包常见问题
+
+1. **图标不显示**：
+   - 确保打包命令包含`--add-data="ui/icons;ui/icons"`
+   - 检查代码中使用`os.path.join`构建图标路径
+
+2. **权限错误**：
+   - 关闭正在运行的exe程序
+   - 以管理员身份运行build.bat
+   - 手动删除dist目录下的旧exe文件
+
+3. **打包失败**：
+   - 检查Python环境是否完整
+   - 确保所有依赖已安装
+   - 尝试添加`--clean`参数
 
 ## 默认账号
 
@@ -58,7 +74,11 @@ shopping_tool/
 │   ├── browse_tab.py      # 数据浏览
 │   ├── stats_tab.py       # 统计分析
 │   ├── user_tab.py        # 用户管理
-│   └── edit_dialog.py     # 编辑对话框
+│   ├── edit_dialog.py     # 编辑对话框
+│   └── icons/             # 图标资源
+│       ├── edit-solid.svg
+│       ├── trash-solid.svg
+│       └── eye-solid.svg
 ├── data/                  # 数据文件
 │   ├── users.csv          # 用户数据
 │   └── records.csv        # 购物记录
