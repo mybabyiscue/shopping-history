@@ -152,13 +152,7 @@ class RecordDialog(QDialog):
                 # 添加详细调试信息
                 parent_info = "无父窗口" if not self.parent() else f"父窗口类型: {type(self.parent()).__name__}"
                 has_attr = hasattr(self.parent(), 'current_summary_id') if self.parent() else False
-                debug_msg = f"""无法获取当前汇总ID
-{parent_info}
-父窗口是否有current_summary_id属性: {has_attr}
-操作步骤:
-1. 在报销记录界面点击"查看"按钮
-2. 确保已选择有效的汇总记录
-3. 再次尝试添加记录"""
+                debug_msg = f"""无法获取当前汇总ID"""
                 QMessageBox.warning(self, "调试信息", debug_msg)
                 return
 
@@ -220,10 +214,14 @@ class RecordDialog(QDialog):
             start_date = self.start_date.date().toString("yyyy-MM-dd")
             end_date = self.end_date.date().toString("yyyy-MM-dd")
             
+            # 筛选汇总ID为空的记录并按购买日期降序排列
             filtered_records = [
                 r for r in records 
-                if not r.get("汇总ID", "").strip()  # 筛选汇总ID为空的记录
+                if not r.get("汇总ID", "").strip()
             ]
+            filtered_records = sorted(filtered_records, 
+                                   key=lambda x: x.get("购买日期", ""), 
+                                   reverse=True)
 
             # 计算分页
             self.total_pages = max(1, (len(filtered_records) + self.items_per_page - 1) // self.items_per_page)
