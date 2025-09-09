@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (
     QHeaderView, QPushButton, QMessageBox, QLabel, QHBoxLayout
 )
 from PyQt5.QtCore import Qt
+from ui.record_dialog import RecordDialog
 
 
 class DetailDialog(QDialog):
@@ -30,6 +31,15 @@ class DetailDialog(QDialog):
         super().resizeEvent(event)
         if hasattr(self, 'table'):
             self.table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
+
+    def on_add_record(self):
+        """添加新记录"""
+        dialog = RecordDialog(self)
+        if dialog.exec_() == QDialog.Accepted:
+            QMessageBox.information(self, "提示", "记录添加成功")
+            # 刷新表格数据
+            if hasattr(self.parent(), 'load_data'):
+                self.parent().load_data()
 
     def setup_ui(self, data):
         layout = QVBoxLayout(self)
@@ -87,7 +97,18 @@ class DetailDialog(QDialog):
 
         layout.addWidget(self.table)
 
+        # 底部按钮区域
+        btn_layout = QHBoxLayout()
+        btn_layout.addStretch()
+        
+        # 添加按钮
+        add_btn = QPushButton("添加")
+        add_btn.clicked.connect(self.on_add_record)
+        btn_layout.addWidget(add_btn)
+        
         # 关闭按钮
         close_btn = QPushButton("关闭")
         close_btn.clicked.connect(self.accept)
-        layout.addWidget(close_btn, 0, Qt.AlignRight)
+        btn_layout.addWidget(close_btn)
+        
+        layout.addLayout(btn_layout)

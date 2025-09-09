@@ -159,7 +159,8 @@ class ReimbursementTab(QWidget):
             dialog = DetailDialog({
                 "summary_info": summary_info,
                 "related_records": [r for r in related_records 
-                                  if str(r.get('汇总ID', '')).strip() == str(summary_id).strip()]
+                                  if str(r.get('汇总ID', '')).strip() == str(summary_id).strip()],
+                "parent_tab": self
             }, self)
             dialog.exec_()
 
