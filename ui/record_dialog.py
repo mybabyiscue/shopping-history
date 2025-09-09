@@ -149,7 +149,17 @@ class RecordDialog(QDialog):
             if hasattr(self.parent(), 'current_summary_id'):
                 summary_id = self.parent().current_summary_id
             else:
-                QMessageBox.warning(self, "警告", "无法获取当前汇总ID")
+                # 添加详细调试信息
+                parent_info = "无父窗口" if not self.parent() else f"父窗口类型: {type(self.parent()).__name__}"
+                has_attr = hasattr(self.parent(), 'current_summary_id') if self.parent() else False
+                debug_msg = f"""无法获取当前汇总ID
+{parent_info}
+父窗口是否有current_summary_id属性: {has_attr}
+操作步骤:
+1. 在报销记录界面点击"查看"按钮
+2. 确保已选择有效的汇总记录
+3. 再次尝试添加记录"""
+                QMessageBox.warning(self, "调试信息", debug_msg)
                 return
 
             # 更新选中的记录
@@ -163,7 +173,8 @@ class RecordDialog(QDialog):
 
             # 写回文件
             with open(records_path, "w", encoding="utf-8", newline="") as f:
-                writer = csv.DictWriter(f, fieldnames=reader.fieldnames)
+                fieldnames = reader.fieldnames or []
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
                 writer.writeheader()
                 writer.writerows(updated_records)
 

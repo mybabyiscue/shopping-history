@@ -18,10 +18,12 @@ class DetailDialog(QDialog):
                 "汇总时间": str,
                 "是否报销": str
             },
-            "related_records": list[dict]  # 相关记录列表
+            "related_records": list[dict],  # 相关记录列表
+            "parent_tab": ReimbursementTab  # 父级报销记录Tab
         }
         """
         super().__init__(parent)
+        self.parent_tab = data.get("parent_tab")
         self.setWindowTitle("汇总详情")
         self.setMinimumWidth(800)
         self.resize(1000, 600)
@@ -32,14 +34,18 @@ class DetailDialog(QDialog):
         if hasattr(self, 'table'):
             self.table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
 
+    def refresh_data(self):
+        """刷新表格数据"""
+        if hasattr(self.parent_tab, 'view_details'):
+            self.parent_tab.view_details(self.parent_tab.current_summary_id)
+        self.accept()  # 关闭当前对话框，父窗口会重新打开
+
     def on_add_record(self):
         """添加新记录"""
-        dialog = RecordDialog(self)
+        dialog = RecordDialog(self.parent_tab if self.parent_tab else self)
         if dialog.exec_() == QDialog.Accepted:
             QMessageBox.information(self, "提示", "记录添加成功")
-            # 刷新表格数据
-            if hasattr(self.parent(), 'load_data'):
-                self.parent().load_data()
+            self.refresh_data()
 
     def setup_ui(self, data):
         layout = QVBoxLayout(self)
@@ -100,6 +106,11 @@ class DetailDialog(QDialog):
         # 底部按钮区域
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
+        
+        # 刷新按钮
+        refresh_btn = QPushButton("刷新")
+        refresh_btn.clicked.connect(self.refresh_data)
+        btn_layout.addWidget(refresh_btn)
         
         # 添加按钮
         add_btn = QPushButton("添加")

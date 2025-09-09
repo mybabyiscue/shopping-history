@@ -11,6 +11,7 @@ import os
 class ReimbursementTab(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.current_summary_id = None  # 当前查看的汇总ID
         self.setup_ui()
         self.load_data()
 
@@ -21,9 +22,6 @@ class ReimbursementTab(QWidget):
 
         # 按钮区域
         btn_layout = QHBoxLayout()
-        self.refresh_btn = QPushButton("刷新")
-        self.refresh_btn.clicked.connect(self.load_data)
-        btn_layout.addWidget(self.refresh_btn)
         btn_layout.addStretch()
         main_layout.addLayout(btn_layout)
 
@@ -124,6 +122,7 @@ class ReimbursementTab(QWidget):
 
     def view_details(self, summary_id):
         """查看汇总详情"""
+        self.current_summary_id = summary_id  # 记录当前查看的汇总ID
         try:
             # 首先从summary.csv获取汇总基本信息
             summary_path = os.path.join("data", "summary.csv")
