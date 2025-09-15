@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Qt5Agg')
+
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QWidget, QVBoxLayout, 
                              QHBoxLayout, QLabel, QMessageBox, QPushButton)
 from PyQt5.QtCore import Qt

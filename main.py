@@ -56,7 +56,10 @@ def main():
     login_window = LoginWindow()
     login_window.show()
     
-    sys.exit(app.exec_())
+    try:
+        sys.exit(app.exec_())
+    except KeyboardInterrupt:
+        sys.exit(0)
 
 if __name__ == '__main__':
     main()

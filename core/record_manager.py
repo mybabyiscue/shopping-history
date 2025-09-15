@@ -338,6 +338,51 @@ class RecordManager:
             'platform_data': platform_data,
             'category_data': category_data
         }
+        
+    def get_monthly_stats(self):
+        """获取月度统计数据"""
+        stats = self.get_statistics()
+        return stats['monthly_data']
+        
+    def get_platform_stats(self):
+        """获取平台统计数据"""
+        stats = self.get_statistics()
+        return stats['platform_data']
+        
+    def get_filtered_records(self, start_date=None, end_date=None, category=None, 
+                           platform=None, received=None, invoiced=None):
+        """获取筛选后的记录"""
+        filters = {}
+        if start_date:
+            filters['start_date'] = start_date
+        if end_date:
+            filters['end_date'] = end_date
+        if category:
+            filters['purposes'] = [category]
+        if platform:
+            filters['platforms'] = [platform]
+        if received:
+            filters['is_received'] = received == "已收到"
+        if invoiced:
+            filters['is_invoiced'] = invoiced == "已开票"
+            
+        raw_records = self.query_records(filters)
+        
+        # 转换为标准格式
+        records = []
+        for r in raw_records:
+            records.append({
+                'date': r.get('购买日期', ''),
+                'category': r.get('用途', ''),
+                'platform': r.get('平台', ''),
+                'item': r.get('物品', ''),
+                'quantity': int(r.get('数量', 0)),
+                'amount': float(r.get('总价', 0)),
+                'received': r.get('是否收到', '') == '是',
+                'invoiced': r.get('是否开票', '') == '是'
+            })
+            
+        return records
     
     # 汇总记录相关方法
     def add_summary(self, summary_data):
