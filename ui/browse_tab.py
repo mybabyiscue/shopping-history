@@ -329,9 +329,13 @@ class BrowseTab(QWidget):
         self.prev_btn.setEnabled(self.current_page > 1)
         self.next_btn.setEnabled(self.current_page < total_pages)
 
-        # 计算总计
+        # 计算总计和总数量
         total = sum(float(r.get("总价", 0)) for r in self.filtered_records)
-        self.total_label.setText(f"查询结果总价: <b><font color='red'>¥{total:.2f}</font></b>")
+        total_quantity = sum(int(r.get("数量", 0)) for r in self.filtered_records)
+        self.total_label.setText(
+            f"查询结果总价: <b><font color='red'>¥{total:.2f}</font></b> | "
+            f"总数量: <b><font color='blue'>{total_quantity}</font></b>"
+        )
 
         # 重新均分列宽
         self.adjust_table_columns()
